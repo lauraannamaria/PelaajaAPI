@@ -1,5 +1,5 @@
 from fastapi import HTTPException
-from .models import PlayerDB, PlayerBase, PlayerCreate
+from .models import PlayerDB, PlayerBase, PlayerCreate, EventDB
 from sqlmodel import Session, select
 
 #players = {
@@ -21,10 +21,12 @@ def get_players(session: Session):
     return session.exec(select(PlayerDB)).all()
 
 
-def get_player(session: Session, id: int):
+def get_player(session: Session, id: int,):
     player = session.get(PlayerDB, id)
     if not player:
         raise HTTPException(status_code=404, detail=f"{id} not found")
+    events = session.exec(select(EventDB).where(EventDB.player_id)).all()
+    player.events = events
     return player
 
 
